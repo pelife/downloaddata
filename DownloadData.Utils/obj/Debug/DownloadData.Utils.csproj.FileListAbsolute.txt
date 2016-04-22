@@ -1,0 +1,5 @@
+g:\felipe\programming\DownloadData\DownloadData.Utils\bin\Debug\DownloadData.Utils.dll
+g:\felipe\programming\DownloadData\DownloadData.Utils\bin\Debug\DownloadData.Utils.pdb
+g:\felipe\programming\DownloadData\DownloadData.Utils\obj\Debug\DownloadData.Utils.csprojResolveAssemblyReference.cache
+g:\felipe\programming\DownloadData\DownloadData.Utils\obj\Debug\DownloadData.Utils.dll
+g:\felipe\programming\DownloadData\DownloadData.Utils\obj\Debug\DownloadData.Utils.pdb
