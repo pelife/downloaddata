@@ -3,3 +3,7 @@ g:\felipe\programming\DownloadData\DownloadData.Utils\bin\Debug\DownloadData.Uti
 g:\felipe\programming\DownloadData\DownloadData.Utils\obj\Debug\DownloadData.Utils.csprojResolveAssemblyReference.cache
 g:\felipe\programming\DownloadData\DownloadData.Utils\obj\Debug\DownloadData.Utils.dll
 g:\felipe\programming\DownloadData\DownloadData.Utils\obj\Debug\DownloadData.Utils.pdb
+G:\felipe\programming\git\downloaddata\DownloadData.Utils\bin\Debug\DownloadData.Utils.dll
+G:\felipe\programming\git\downloaddata\DownloadData.Utils\bin\Debug\DownloadData.Utils.pdb
+G:\felipe\programming\git\downloaddata\DownloadData.Utils\obj\Debug\DownloadData.Utils.dll
+G:\felipe\programming\git\downloaddata\DownloadData.Utils\obj\Debug\DownloadData.Utils.pdb

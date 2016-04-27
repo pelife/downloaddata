@@ -2,7 +2,7 @@
 
 namespace DownloadData.TituloPublico
 {
-    public class CotacaoTituloPublicoBCB
+    public class CotacaoTituloPublicoTesouroDireto
     {
         public DateTime DataCotacao { get; set; }
         public string CodigoTitulo { get; set; }

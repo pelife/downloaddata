@@ -13,13 +13,13 @@ namespace DownloadData.TituloPublico.Tests
             
             var localtoSaveFile = @"c:\temp\download_bcb\{$ano}\{$tipoTituloPublico}\";
 
-            
 
+
+            lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.NTNBPrincipal);
             lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.LFT);
             lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.LTN);
             lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.NTNC);
-            lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.NTNB);
-            lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.NTNBPrincipal);
+            lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.NTNB);            
             lftDownloader.DownloadYear(2016, localtoSaveFile, TipoTituloPublicoBCB.NTNF);
 
             lftDownloader.DownloadYear(2015, localtoSaveFile, TipoTituloPublicoBCB.LFT);

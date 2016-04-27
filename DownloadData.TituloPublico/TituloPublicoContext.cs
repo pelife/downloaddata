@@ -13,18 +13,41 @@ namespace DownloadData.TituloPublico
             Database.Log = s => System.Diagnostics.Debug.Write(s);            
         }
 
-        public DbSet<CotacaoTituloPublicoBCB> CotacaoTituloPublicoBCB { get; set; }
+        public DbSet<CotacaoTituloPublicoTesouroDireto> CotacaoTituloPublicoTD { get; set; }
+        public DbSet<ExtratoConta> ExtratoConta { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-            modelBuilder.Configurations.Add(new CotacaoTituloPublicoBCBTypeConfiguration());
+            modelBuilder.Configurations.Add(new CotacaoTituloPublicoTesouroDiretoTypeConfiguration());
+            modelBuilder.Configurations.Add(new ExtratoContaTypeConfiguration());
         }
     }
 
-    internal class CotacaoTituloPublicoBCBTypeConfiguration : EntityTypeConfiguration<CotacaoTituloPublicoBCB>
+    internal class ExtratoContaTypeConfiguration : EntityTypeConfiguration<ExtratoConta>
     {
-        public CotacaoTituloPublicoBCBTypeConfiguration()
+        public ExtratoContaTypeConfiguration()
+        {
+            //chave
+            HasKey(k => new { k.Conta, k.DataTransacao , k.DocumentoReferencia , k.ValorTransacao});
+
+            //colunas
+            Property(p => p.Conta).HasColumnName("nr_conta");
+            Property(p => p.DataTransacao).HasColumnName("dt_transacao");
+            Property(p => p.DocumentoReferencia).HasColumnName("nr_documento");
+            Property(p => p.Historico).HasColumnName("tx_descricao");
+            Property(p => p.ValorTransacao).HasColumnName("vl_montante");
+            Property(p => p.TipoTransacao).HasColumnName("tp_movimento");
+
+            //tabela
+            ToTable("tb_extrato_conta");
+        }
+
+    }
+
+    internal class CotacaoTituloPublicoTesouroDiretoTypeConfiguration : EntityTypeConfiguration<CotacaoTituloPublicoTesouroDireto>
+    {
+        public CotacaoTituloPublicoTesouroDiretoTypeConfiguration()
         {
             //chave
             HasKey(k => new { k.DataCotacao, k.CodigoTitulo });
@@ -42,8 +65,7 @@ namespace DownloadData.TituloPublico
             
 
             //tabela
-            ToTable("tb_valor_titulo_publico_bcb");
+            ToTable("tb_valor_titulo_publico_tesouro_direto");
         }
     }
 }
-

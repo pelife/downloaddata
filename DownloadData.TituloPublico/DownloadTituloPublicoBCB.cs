@@ -36,31 +36,41 @@ namespace DownloadData.TituloPublico
                     if (Downloader.DownloadFile(fileName, pathToSaveTratado, urlFile))
                     {
                         var dadosPlanilha = LerDadosSyncfusion(CaminhoCompleto);
-                        var cotacoes = TransformarCotacoes(dadosPlanilha);
+                        var cotacoesNovas = TransformarCotacoes(dadosPlanilha);
+                        var cotacoesAntigas = dbContext.CotacaoTituloPublicoTD;
 
-                        dbContext.CotacaoTituloPublicoBCB.AddRange(cotacoes);
 
+
+                        var maxCotacaoTitulo = cotacoesAntigas
+                              .GroupBy(i => i.CodigoTitulo)
+                              .SelectMany(g => g
+                                  .Where(i => i.DataCotacao == g.Max(m => m.DataCotacao)))
+                              .Distinct()
+                              .ToList();
+
+                        var queryFiltraPendentes = from item in cotacoesNovas
+                                                   join item2 in maxCotacaoTitulo
+                                                   on item.CodigoTitulo equals item2.CodigoTitulo
+                                                   where item.DataCotacao > item2.DataCotacao
+                                                   select item;
+
+                        var registrosInserir = queryFiltraPendentes.ToList();
+
+                        cotacoesAntigas.AddRange(registrosInserir);
                     }
-
                     dbContext.SaveChanges();
                 }
             }
-            catch (Exception ex)
-            {
-
-                throw ex;
-            }
-
-
+            catch (Exception ex) { throw ex; }
         }
 
-        private IList<CotacaoTituloPublicoBCB> TransformarCotacoes(DataSet tabelasCotacoes)
+        private IList<CotacaoTituloPublicoTesouroDireto> TransformarCotacoes(DataSet tabelasCotacoes)
         {
-            List<CotacaoTituloPublicoBCB> cotacoesTransformadas = null;
+            List<CotacaoTituloPublicoTesouroDireto> cotacoesTransformadas = null;
 
             if (tabelasCotacoes != null && tabelasCotacoes.Tables.Count > 0)
             {
-                cotacoesTransformadas = new List<CotacaoTituloPublicoBCB>();
+                cotacoesTransformadas = new List<CotacaoTituloPublicoTesouroDireto>();
                 foreach (DataTable umaTabelaCotacoes in tabelasCotacoes.Tables)
                     cotacoesTransformadas.AddRange(LerCotacoes(umaTabelaCotacoes));
 
@@ -70,7 +80,7 @@ namespace DownloadData.TituloPublico
             return cotacoesTransformadas;
         }
 
-        private IEnumerable<CotacaoTituloPublicoBCB> LerCotacoes(DataTable umaTabelaCotacoes)
+        private IEnumerable<CotacaoTituloPublicoTesouroDireto> LerCotacoes(DataTable umaTabelaCotacoes)
         {
             CultureInfo provider = null;
 
@@ -78,7 +88,7 @@ namespace DownloadData.TituloPublico
             var cotacoes = umaTabelaCotacoes.AsEnumerable()
                 .Skip(1)
                 .Select(
-                    dr => new CotacaoTituloPublicoBCB
+                    dr => new CotacaoTituloPublicoTesouroDireto
                     {
                         DataCotacao = umaTabelaCotacoes.Columns["dt_valor"].DataType == typeof(string) ?
                             DateTime.ParseExact(dr["dt_valor"].ToString(), formato_data, provider, DateTimeStyles.None) :
@@ -161,7 +171,7 @@ namespace DownloadData.TituloPublico
                                                             planilha.UsedRange.LastColumn,
                                                             ExcelExportDataTableOptions.ColumnNames | ExcelExportDataTableOptions.DetectColumnTypes);
 
-                umConjuntoDados.TableName = nomePlanilha.Replace(" ", "_");
+                umConjuntoDados.TableName = nomePlanilha.Replace(" Principal","P").Replace(" ", "_");
                 umConjuntoDados = DeletarRegistrosSemDados(umConjuntoDados);
                 AjustarNomeColuna(umConjuntoDados);
                 AdicionarSiglaTitulo(umConjuntoDados, umConjuntoDados.TableName);
