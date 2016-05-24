@@ -39,20 +39,38 @@ namespace DownloadData.TituloPublico
                         var cotacoesNovas = TransformarCotacoes(dadosPlanilha);
                         var cotacoesAntigas = dbContext.CotacaoTituloPublicoTD;
 
+                        var defaultDates = (from cotacaoNova in cotacoesNovas
+                                            select new
+                                            {
+                                                CodigoTitulo = cotacaoNova.CodigoTitulo,
+                                                MinDataCotacao = DateTime.Today,
+                                                MaxDataCotacao = DateTime.Today
+                                            }).ToList()
+                                            .Distinct();
 
+                        var maxCotacaoTitulo = (from x in cotacoesAntigas
+                                                group x by x.CodigoTitulo into y
+                                                orderby y.Key
+                                                select new
+                                                {
+                                                    CodigoTitulo = y.Key,
+                                                    MinDataCotacao = y.Min(z => z.DataCotacao),
+                                                    MaxDataCotacao = y.Max(z => z.DataCotacao)
+                                                }).ToList()
+                                               .Distinct();
 
-                        var maxCotacaoTitulo = cotacoesAntigas
-                              .GroupBy(i => i.CodigoTitulo)
-                              .SelectMany(g => g
-                                  .Where(i => i.DataCotacao == g.Max(m => m.DataCotacao)))
-                              .Distinct()
-                              .ToList();
+                        var dicionario = maxCotacaoTitulo.ToDictionary(p => p.CodigoTitulo);
 
-                        var queryFiltraPendentes = from item in cotacoesNovas
-                                                   join item2 in maxCotacaoTitulo
-                                                   on item.CodigoTitulo equals item2.CodigoTitulo
-                                                   where item.DataCotacao > item2.DataCotacao
-                                                   select item;
+                        foreach (var umDefault in defaultDates)
+                            if (!dicionario.ContainsKey(umDefault.CodigoTitulo))
+                                dicionario[umDefault.CodigoTitulo] = umDefault;
+
+                        var listaTotal = dicionario.Values.ToList();
+
+                        var queryFiltraPendentes = (from cotacaoNova in cotacoesNovas
+                                                    from maxCotacao in listaTotal
+                                                      .Where(maxCot => maxCot.CodigoTitulo == cotacaoNova.CodigoTitulo && cotacaoNova.DataCotacao < maxCot.MinDataCotacao)
+                                                    select cotacaoNova);
 
                         var registrosInserir = queryFiltraPendentes.ToList();
 
@@ -171,7 +189,7 @@ namespace DownloadData.TituloPublico
                                                             planilha.UsedRange.LastColumn,
                                                             ExcelExportDataTableOptions.ColumnNames | ExcelExportDataTableOptions.DetectColumnTypes);
 
-                umConjuntoDados.TableName = nomePlanilha.Replace(" Principal","P").Replace(" ", "_");
+                umConjuntoDados.TableName = nomePlanilha.Replace(" Principal", "P").Replace(" ", "_");
                 umConjuntoDados = DeletarRegistrosSemDados(umConjuntoDados);
                 AjustarNomeColuna(umConjuntoDados);
                 AdicionarSiglaTitulo(umConjuntoDados, umConjuntoDados.TableName);
